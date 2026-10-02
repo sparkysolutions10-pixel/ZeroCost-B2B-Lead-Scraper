@@ -1,0 +1,116 @@
+{
+  "name": "Sparky Digital - Reddit Pain Point Scraper",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e1f1c9a0-1234-4a56-b789-abcdef123456",
+      "name": "When clicking \"Test Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 240]
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/smallbusiness/search.json?q=zapier OR automate OR expensive&restrict_sr=1&sort=new",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) SparkyDigitalBot/1.0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2b2c9a0-1234-4a56-b789-abcdef123456",
+      "name": "Scrape Reddit /r/smallbusiness",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [440, 240]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.children",
+        "options": {}
+      },
+      "id": "c3d3c9a0-1234-4a56-b789-abcdef123456",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [660, 240]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Title",
+              "value": "={{ $json.data.title }}"
+            },
+            {
+              "name": "Text",
+              "value": "={{ $json.data.selftext }}"
+            },
+            {
+              "name": "Author",
+              "value": "={{ $json.data.author }}"
+            },
+            {
+              "name": "URL",
+              "value": "={{ $json.data.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4e4c9a0-1234-4a56-b789-abcdef123456",
+      "name": "Extract Complaint Details",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [880, 240]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Test Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Scrape Reddit /r/smallbusiness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Reddit /r/smallbusiness": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Extract Complaint Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "12345678-1234-1234-1234-123456789abc"
+}

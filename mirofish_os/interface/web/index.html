@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiroFish OS | Master Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            800: '#1a1b1e', /* Darker sleek sidebar */
+                            900: '#25262b', /* Main background */
+                            950: '#2c2e33'  /* Input background */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4a4b50; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5c5f66; }
+        .markdown-body pre { background-color: #141517; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.5rem 0; border: 1px solid #373a40;}
+        .markdown-body p { margin-bottom: 0.75rem; }
+        .markdown-body a { color: #4dabf7; text-decoration: underline; }
+        .markdown-body code:not(pre code) { background-color: rgba(255,255,255,0.1); padding: 0.2em 0.4em; border-radius: 6px; font-family: monospace; font-size: 0.9em; color: #a5d8ff;}
+        .typing-indicator { display: inline-block; width: 6px; height: 6px; background-color: #d1d5db; border-radius: 50%; animation: typing 1.4s infinite ease-in-out; margin: 0 2px; }
+        .typing-indicator:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen flex overflow-hidden font-sans relative selection:bg-blue-500/30">
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 flex-shrink-0 flex flex-col hidden md:flex border-r border-gray-700/50">
+        <div class="p-4 border-b border-gray-700/50 flex items-center justify-between">
+            <span class="font-bold text-lg text-white flex items-center gap-2 tracking-wide">
+                <i class="fa-solid fa-microchip text-blue-500"></i> MiroFish OS
+            </span>
+        </div>
+        <div class="p-3">
+            <button onclick="window.location.reload()" class="w-full text-left px-4 py-3 bg-blue-600/10 border border-blue-500/30 rounded-lg text-sm text-blue-400 font-semibold flex items-center gap-3 hover:bg-blue-600/20 transition shadow-inner">
+                <i class="fa-solid fa-terminal"></i> New Terminal Goal
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3 space-y-2">
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-2 px-2">Active Workers</div>
+            <div class="flex items-center gap-2 px-3 py-2 text-sm text-green-400 bg-green-400/5 rounded-md border border-green-400/10">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> 8 Cores Online
+            </div>
+            <div class="flex items-center gap-2 px-3 py-2 text-sm text-blue-400 bg-blue-400/5 rounded-md border border-blue-400/10">
+                <i class="fa-solid fa-database text-xs"></i> SQLite DB Linked
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-700/50 bg-gray-900/30">
+            <div class="flex items-center gap-3 text-sm text-gray-300">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/50">A</div>
+                <div class="font-bold text-white tracking-wide">SuperAdmin</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col bg-gray-900 h-full relative">
+        <div class="md:hidden flex items-center justify-between p-4 border-b border-gray-700 bg-gray-800">
+            <button class="text-gray-400"><i class="fa-solid fa-bars"></i></button>
+            <span class="font-bold tracking-widest text-blue-400">MIROFISH OS</span>
+            <button class="text-gray-400"><i class="fa-solid fa-plus"></i></button>
+        </div>
+
+        <div id="chat-container" class="flex-1 overflow-y-auto w-full pb-32">
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center px-4">
+                <div class="w-20 h-20 bg-gray-800 rounded-2xl flex items-center justify-center mb-6 shadow-2xl border border-gray-700">
+                    <i class="fa-solid fa-server text-4xl text-blue-500"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold mb-3 text-white tracking-tight">Autonomous Command Center</h1>
+                <p class="text-gray-400 max-w-lg mb-8 text-sm">You are logged in as SuperAdmin. Assign a heavy multi-step goal below, and the OS background workers will execute it completely.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
+                    <button onclick="setInput('Act as an expert SEO writer. Research the latest 2026 AI trends, scrape relevant news, and draft a 2000-word blog post in Markdown format.')" class="bg-gray-800/80 hover:bg-gray-700 border border-gray-700 p-5 rounded-xl text-left transition shadow-lg group">
+                        <div class="text-blue-400 mb-2 group-hover:scale-110 transition w-min"><i class="fa-solid fa-pen-nib"></i></div>
+                        <p class="text-sm font-semibold text-gray-200">Auto-Blogger Workflow</p>
+                        <p class="text-xs text-gray-500 mt-1">Research trends & write full blog</p>
+                    </button>
+                    <button onclick="setInput('I need a complete Python script that monitors a folder for new images, resizes them automatically using PIL, and uploads them to an S3 bucket.')" class="bg-gray-800/80 hover:bg-gray-700 border border-gray-700 p-5 rounded-xl text-left transition shadow-lg group">
+                        <div class="text-green-400 mb-2 group-hover:scale-110 transition w-min"><i class="fa-solid fa-code"></i></div>
+                        <p class="text-sm font-semibold text-gray-200">Architecture / Code Gen</p>
+                        <p class="text-xs text-gray-500 mt-1">Build a complete Python automation tool</p>
+                    </button>
+                </div>
+            </div>
+            <div id="messages-list" class="w-full flex flex-col hidden"></div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="absolute bottom-0 w-full bg-gradient-to-t from-gray-900 via-gray-900 to-transparent pt-10 pb-6 px-4 md:px-8">
+            <div class="max-w-4xl mx-auto relative flex items-end bg-gray-950 rounded-2xl border border-gray-700 shadow-2xl focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
+                <textarea id="user-input" class="w-full max-h-64 bg-transparent text-gray-100 p-5 pr-14 resize-none focus:outline-none text-base" rows="1" placeholder="Define your autonomous goal here..." oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'" onkeydown="handleKeyDown(event)"></textarea>
+                <button id="send-btn" onclick="sendMessage()" class="absolute right-3 bottom-3 p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="text-center text-xs text-gray-500 mt-4 font-mono">OS Version 1.0 (Elite Engineering Mode) • All traffic encrypted locally</div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const messagesList = document.getElementById('messages-list');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        let sessionId = "admin_" + Math.random().toString(36).substring(7);
+
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, { language: lang }).value;
+                return hljs.highlightAuto(code).value;
+            }, breaks: true
+        });
+
+        function setInput(text) { userInput.value = text; sendMessage(); }
+        function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+
+        function appendMessage(role, content) {
+            welcomeScreen.classList.add('hidden');
+            messagesList.classList.remove('hidden');
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `w-full py-8 ${role === 'user' ? 'bg-transparent' : 'bg-gray-800/50 border-y border-gray-700/50 shadow-inner'}`;
+            
+            const innerContainer = document.createElement('div');
+            innerContainer.className = "max-w-4xl mx-auto flex gap-6 px-4 md:px-0";
+            
+            const avatar = document.createElement('div');
+            avatar.className = `w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-white shadow-lg ${role === 'user' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600' : 'bg-gray-900 border border-gray-700'}`;
+            avatar.innerHTML = role === 'user' ? 'A' : '<i class="fa-solid fa-microchip text-blue-400"></i>';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = "flex-1 overflow-hidden min-h-[20px] text-gray-200 markdown-body text-base leading-relaxed";
+            
+            if (role === 'user') {
+                contentDiv.textContent = content;
+            } else if (content === 'typing') {
+                contentDiv.innerHTML = '<div class="flex items-center h-8"><div class="typing-indicator"></div><div class="typing-indicator"></div><div class="typing-indicator"></div></div><div class="text-xs text-blue-400 mt-2 font-mono animate-pulse">Running autonomous background tasks...</div>';
+                contentDiv.id = "typing-indicator";
+            } else {
+                contentDiv.innerHTML = marked.parse(content);
+            }
+
+            innerContainer.appendChild(avatar);
+            innerContainer.appendChild(contentDiv);
+            msgDiv.appendChild(innerContainer);
+            messagesList.appendChild(msgDiv);
+            
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+            return msgDiv;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            appendMessage('user', text);
+            const typingMsg = appendMessage('assistant', 'typing');
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, message: text })
+                });
+                
+                const data = await response.json();
+                typingMsg.remove();
+                
+                if (data.status === "success") {
+                    appendMessage('assistant', data.response);
+                } else {
+                    appendMessage('assistant', `**OS Error:** ${data.detail || 'Exception occurred in daemon.'}`);
+                }
+            } catch (err) {
+                typingMsg.remove();
+                appendMessage('assistant', `**Connection Failure:** The OS daemon on port 5055 is unreachable.`);
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>

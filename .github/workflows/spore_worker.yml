@@ -1,0 +1,40 @@
+name: Decentralized AGI Spore (Worker Node)
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour automatically on GitHub's free servers
+  workflow_dispatch: # Allows manual trigger if needed
+
+jobs:
+  harvest-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout AGI Codebase
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Wake up Spore (Run Lead Generator)
+      run: |
+        python mirofish_os/monetization/lead_generator.py
+      continue-on-error: true # Let the self-refinery handle errors, don't crash the pipeline
+
+    - name: Run Self-Refinery Module (Evolution)
+      run: |
+        python mirofish_os/sparky_core/self_refinery.py
+
+    - name: Global Intelligence Sweep (Learning)
+      run: |
+        python mirofish_os/sparky_core/intelligence_gatherer.py
+
+    - name: Commit & Push Harvested Data
+      run: |
+        git config --local user.email "agi-spore@mirofish.com"
+        git config --local user.name "MiroFish AGI Spore"
+        git add mirofish_os/monetization/client_deliverables/*.csv
+        git commit -m "[AGI Spore] Automated Data Harvest & Code Evolution" || echo "No new data to commit"
+        git push
