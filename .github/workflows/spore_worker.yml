@@ -2,8 +2,12 @@ name: Decentralized AGI Spore (Worker Node)
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour automatically on GitHub's free servers
-  workflow_dispatch: # Allows manual trigger if needed
+    - cron: '0 * * * *' # Runs every hour automatically
+  workflow_dispatch: # Allows manual trigger
+
+permissions:
+  contents: write # 👈 YAHAN PERMISSION ADD KI HAI TAARI AGI CODE PUSH KAR SAKE
+  actions: read
 
 jobs:
   harvest-data:
@@ -17,24 +21,35 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+        
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests faker beautifulsoup4 google-generativeai
 
     - name: Wake up Spore (Run Lead Generator)
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # 👈 CLOUD SE API KEY LEGA
       run: |
         python mirofish_os/monetization/lead_generator.py
-      continue-on-error: true # Let the self-refinery handle errors, don't crash the pipeline
+      continue-on-error: true
 
     - name: Run Self-Refinery Module (Evolution)
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
         python mirofish_os/sparky_core/self_refinery.py
+      continue-on-error: true
 
     - name: Global Intelligence Sweep (Learning)
       run: |
         python mirofish_os/sparky_core/intelligence_gatherer.py
+      continue-on-error: true
 
     - name: Commit & Push Harvested Data
       run: |
-        git config --local user.email "agi-spore@mirofish.com"
-        git config --local user.name "MiroFish AGI Spore"
-        git add mirofish_os/monetization/client_deliverables/*.csv
+        git config --local user.email "agi-spore@sparkydigitalservices.com"
+        git config --local user.name "Sparky AGI Spore"
+        git add .
         git commit -m "[AGI Spore] Automated Data Harvest & Code Evolution" || echo "No new data to commit"
         git push
