@@ -79,4 +79,4 @@ class LeadDataGenerator:
 if __name__ == "__main__":
     # Test generation for a hypothetical paying client
     engine = LeadDataGenerator()
-    engine.generate_csv_product(client_name="Apex Marketing Agency", niche="Dental Clinics", location="New York")
+    engine.generate_csv_product(client_name="Premium_Dubai_Broker", niche="Real Estate Investors and Buyers", location="Dubai")
