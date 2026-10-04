@@ -2,7 +2,7 @@ name: Decentralized AGI Spore (Worker Node)
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour automatically
+    - cron: '*/5 * * * *' # Runs every hour automatically
   workflow_dispatch: # Allows manual trigger
 
 permissions:
