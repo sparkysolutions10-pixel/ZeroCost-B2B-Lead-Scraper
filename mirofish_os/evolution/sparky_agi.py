@@ -78,5 +78,5 @@ class SparkyAGI:
         learning_thread.start()
         logger.info(f"🔥 {self.name} is now LIVE. Gathering data and self-modifying.")
 
-# Initialize Sparky 5.1
+from mirofish_os.brain.vector_memory import vector_memory`n# Initialize Sparky 5.1
 sparky = SparkyAGI()
